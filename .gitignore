@@ -3,3 +3,4 @@
 
 .DS_Store
 /.venv-py37-tf20
+/chap5_CNN/mnist
