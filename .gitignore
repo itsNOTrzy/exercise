@@ -5,3 +5,4 @@
 /.venv-py37-tf20
 /chap5_CNN/mnist
 /chap6_RNN/tangshi_for_pytorch/__pycache__
+chap6_RNN/tangshi_for_pytorch/poem_generator_rnn

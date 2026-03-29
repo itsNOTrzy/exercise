@@ -1,7 +1,5 @@
 import torch.nn as nn
 import torch
-from torch.autograd import Variable
-import torch.nn.functional as F
 
 import numpy as np
 
@@ -14,13 +12,12 @@ def weights_init(m):
         w_bound = np.sqrt(6. / (fan_in + fan_out))
         m.weight.data.uniform_(-w_bound, w_bound)
         m.bias.data.fill_(0)
-        print("inital  linear weight ")
 
 
 class word_embedding(nn.Module):
     def __init__(self,vocab_length , embedding_dim):
         super(word_embedding, self).__init__()
-        w_embeding_random_intial = np.random.uniform(-1,1,size=(vocab_length ,embedding_dim))
+        w_embeding_random_intial = np.random.uniform(-1,1,size=(vocab_length ,embedding_dim)).astype(np.float32)
         self.word_embedding = nn.Embedding(vocab_length,embedding_dim)
         self.word_embedding.weight.data.copy_(torch.from_numpy(w_embeding_random_intial))
     def forward(self,input_sentence):
@@ -65,16 +62,14 @@ class RNN_model(nn.Module):
         # here you need to put the "batch_input"  input the self.lstm which is defined before.
         # the hidden output should be named as output, the initial hidden state and cell state set to zero.
         # ???
-        h0 = torch.zeros(2, batch_input.size(0), self.lstm_dim, device=batch_input.device)
-        c0 = torch.zeros(2, batch_input.size(0), self.lstm_dim, device=batch_input.device)
+        h0 = torch.zeros(2, batch_input.size(0), self.lstm_dim, device=batch_input.device, dtype=batch_input.dtype)
+        c0 = torch.zeros(2, batch_input.size(0), self.lstm_dim, device=batch_input.device, dtype=batch_input.dtype)
         output, _ = self.rnn_lstm(batch_input, (h0, c0))
 
         ################################################
         out = output.contiguous().view(-1,self.lstm_dim)
 
-        out =  F.relu(self.fc(out))
-
-        out = self.softmax(out)
+        out = self.softmax(self.fc(out))
 
         if is_test:
             prediction = out[ -1, : ].view(1,-1)
